@@ -212,28 +212,36 @@
       border:1px solid var(--border);border-radius:999px;padding:3px 11px;
       font-family:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace}
     .card .links{margin-top:16px;font-size:.9rem;display:flex;gap:16px;font-weight:600}
-    .card.is-hidden{display:none}
-
-    /* project search */
-    .search{position:relative;display:flex;align-items:center;gap:10px;max-width:460px;
-      height:48px;margin:0 0 26px;padding:0 12px 0 16px;
+    /* navbar search + autosuggest */
+    .nav-left{display:flex;align-items:center;gap:14px;flex:1 1 auto;min-width:0}
+    .nav-left .logo{flex:none;white-space:nowrap}
+    .nav-search{position:relative;flex:0 1 340px;min-width:0}
+    .nav-search .field{display:flex;align-items:center;gap:8px;height:40px;padding:0 8px 0 12px;
       background:var(--card);border:1px solid var(--border);border-radius:999px;
-      box-shadow:var(--shadow-sm);transition:border-color .18s,box-shadow .18s}
-    .search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-    .search svg{width:18px;height:18px;color:var(--muted);flex:none}
-    .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);
-      font:inherit;font-size:1rem;outline:none}
-    .search input::placeholder{color:var(--muted)}
-    .search input::-webkit-search-cancel-button{-webkit-appearance:none;height:14px;width:14px;
-      background:var(--muted);
-      -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;cursor:pointer}
-    .search .kbd{display:flex;gap:4px;flex:none}
-    .search .kbd kbd{font-family:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;
-      font-size:.72rem;color:var(--muted);background:var(--code-bg);border:1px solid var(--border);
-      border-radius:6px;padding:2px 7px;line-height:1.45}
-    @media(max-width:520px){.search .kbd{display:none}}
-    .search-none{display:none;color:var(--muted);margin-top:4px}
-    .search-none.show{display:block}
+      transition:border-color .18s,box-shadow .18s}
+    .nav-search .field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .nav-search .field svg{width:16px;height:16px;color:var(--muted);flex:none}
+    .nav-search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);
+      font:inherit;font-size:.92rem;outline:none}
+    .nav-search input::placeholder{color:var(--muted)}
+    .nav-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+    .nav-search .kbd{display:flex;gap:3px;flex:none}
+    .nav-search .kbd kbd{font-family:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;
+      font-size:.68rem;color:var(--muted);background:var(--code-bg);border:1px solid var(--border);
+      border-radius:5px;padding:1px 6px;line-height:1.5}
+    .suggest{position:absolute;top:calc(100% + 8px);left:0;right:0;margin:0;padding:6px;list-style:none;
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+      box-shadow:var(--shadow-md);z-index:60;max-height:min(64vh,440px);overflow-y:auto}
+    .suggest[hidden]{display:none}
+    .suggest li{list-style:none}
+    .suggest button{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;cursor:pointer;
+      background:transparent;border:0;border-radius:8px;padding:8px 11px;color:var(--fg);font:inherit}
+    .suggest button:hover,.suggest button[aria-selected="true"]{background:var(--accent-soft)}
+    .suggest .s-name{font-weight:600;font-size:.9rem;color:var(--heading)}
+    .suggest .s-desc{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .suggest .s-empty{padding:10px 11px;color:var(--muted);font-size:.86rem}
+    .card.flash{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),var(--shadow-md)}
+    @media(max-width:680px){.nav-search{flex:1 1 auto;max-width:none}.nav-search .kbd{display:none}}
 
     /* about */
     .band{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -264,7 +272,17 @@
 
   <header class="nav">
     <div class="wrap nav-inner">
-      <span class="logo">odere<span class="grad">-pro</span></span>
+      <div class="nav-left">
+        <span class="logo">odere<span class="grad">-pro</span></span>
+        <div class="nav-search" role="search">
+          <div class="field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="navSearch" type="search" placeholder="Search projects…" data-i18n-ph="search.placeholder" role="combobox" aria-expanded="false" aria-controls="navSuggest" aria-autocomplete="list" aria-label="Search projects" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <span class="kbd" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></span>
+          </div>
+          <ul class="suggest" id="navSuggest" role="listbox" aria-label="Project suggestions" hidden></ul>
+        </div>
+      </div>
       <div class="nav-right">
         <nav class="nav-links" aria-label="Main navigation">
           <a href="#projects" data-i18n="nav.projects">Projects</a>
@@ -316,11 +334,6 @@
       <div class="wrap">
         <h2 class="section-title" data-i18n="proj.title">Featured projects</h2>
         <p class="section-sub" data-i18n="proj.sub">Open-source agent tooling, AI apps, and guides for the Software 3.0 era.</p>
-        <div class="search" role="search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <input id="projSearch" type="search" placeholder="Search projects…" data-i18n-ph="search.placeholder" aria-label="Search projects" autocomplete="off" autocapitalize="off" spellcheck="false" />
-          <span class="kbd" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></span>
-        </div>
         <div class="grid">
 
           <article class="card">
@@ -387,7 +400,6 @@
           </article>
 
         </div>
-        <p class="search-none" id="projNone" data-i18n="search.none">No projects match your search.</p>
       </div>
     </section>
 
@@ -590,30 +602,81 @@
       applyTheme(root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
       document.getElementById('yr').textContent = new Date().getFullYear();
 
-      // project search + ⌘K / Ctrl+K to focus
-      var searchInput = document.getElementById('projSearch');
-      var projCards = Array.prototype.slice.call(document.querySelectorAll('#projects .card'));
-      var projNone = document.getElementById('projNone');
-      function applyProjFilter() {
-        var q = (searchInput.value || '').trim().toLowerCase();
-        var shown = 0;
-        projCards.forEach(function (c) {
-          var hit = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
-          c.classList.toggle('is-hidden', !hit);
-          if (hit) shown++;
-        });
-        if (projNone) projNone.classList.toggle('show', shown === 0);
+      // navbar project search + autosuggest
+      var navSearch = document.getElementById('navSearch');
+      var suggestBox = document.getElementById('navSuggest');
+      var projects = Array.prototype.slice.call(document.querySelectorAll('#projects .card')).map(function (card) {
+        var a = card.querySelector('h3 a');
+        return { card: card, name: a ? a.textContent.trim() : '' };
+      });
+      var matches = [], activeIdx = -1;
+      function descOf(p) { var el = p.card.querySelector('p'); return el ? el.textContent.trim() : ''; }
+      function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      function closeSuggest() {
+        if (!suggestBox) return;
+        suggestBox.hidden = true; suggestBox.innerHTML = '';
+        navSearch.setAttribute('aria-expanded', 'false');
+        navSearch.removeAttribute('aria-activedescendant');
+        matches = []; activeIdx = -1;
       }
-      if (searchInput) {
-        searchInput.addEventListener('input', applyProjFilter);
-        searchInput.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') { searchInput.value = ''; applyProjFilter(); searchInput.blur(); }
+      function jumpTo(p) {
+        closeSuggest(); navSearch.blur();
+        p.card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        p.card.classList.add('flash');
+        setTimeout(function () { p.card.classList.remove('flash'); }, 1400);
+      }
+      function renderSuggest() {
+        if (!navSearch) return;
+        var q = navSearch.value.trim().toLowerCase();
+        if (!q) { closeSuggest(); return; }
+        matches = projects.filter(function (p) { return (p.name + ' ' + descOf(p)).toLowerCase().indexOf(q) !== -1; });
+        matches.sort(function (a, b) {
+          return (a.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1) - (b.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1);
         });
+        suggestBox.innerHTML = '';
+        if (!matches.length) {
+          var lang = root.getAttribute('lang') === 'sv' ? 'sv' : 'en';
+          var li = document.createElement('li');
+          li.className = 's-empty';
+          li.textContent = (I18N[lang] && I18N[lang]['search.none']) || 'No matches';
+          suggestBox.appendChild(li);
+        } else {
+          matches.forEach(function (p, i) {
+            var li = document.createElement('li');
+            var btn = document.createElement('button');
+            btn.type = 'button'; btn.setAttribute('role', 'option'); btn.id = 'sg-' + i;
+            btn.innerHTML = '<span class="s-name">' + esc(p.name) + '</span><span class="s-desc">' + esc(descOf(p)) + '</span>';
+            btn.addEventListener('click', function () { jumpTo(matches[i]); });
+            li.appendChild(btn); suggestBox.appendChild(li);
+          });
+        }
+        suggestBox.hidden = false;
+        navSearch.setAttribute('aria-expanded', 'true');
+        activeIdx = -1;
+      }
+      function setActive(i) {
+        var btns = suggestBox.querySelectorAll('button');
+        if (!btns.length) return;
+        activeIdx = (i + btns.length) % btns.length;
+        for (var j = 0; j < btns.length; j++) btns[j].setAttribute('aria-selected', j === activeIdx ? 'true' : 'false');
+        btns[activeIdx].scrollIntoView({ block: 'nearest' });
+        navSearch.setAttribute('aria-activedescendant', btns[activeIdx].id);
+      }
+      if (navSearch) {
+        navSearch.addEventListener('input', renderSuggest);
+        navSearch.addEventListener('focus', function () { if (navSearch.value.trim()) renderSuggest(); });
+        navSearch.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowDown') { e.preventDefault(); if (suggestBox.hidden) renderSuggest(); setActive(activeIdx + 1); }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIdx - 1); }
+          else if (e.key === 'Enter') { if (activeIdx >= 0 && matches[activeIdx]) { e.preventDefault(); jumpTo(matches[activeIdx]); } }
+          else if (e.key === 'Escape') { if (!suggestBox.hidden) closeSuggest(); else { navSearch.value = ''; navSearch.blur(); } }
+        });
+        document.addEventListener('click', function (e) { if (!e.target.closest('.nav-search')) closeSuggest(); });
       }
       document.addEventListener('keydown', function (e) {
         if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
           e.preventDefault();
-          if (searchInput) { searchInput.focus(); searchInput.select(); }
+          if (navSearch) { navSearch.focus(); navSearch.select(); }
         }
       });
     })();
