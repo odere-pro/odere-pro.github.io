@@ -321,9 +321,9 @@
     <section style="padding-top:0" aria-label="At a glance">
       <div class="wrap">
         <div class="stats">
-          <div class="stat"><div class="n">1.8k+</div><div class="l" data-i18n="stat.contrib">Contributions / year</div></div>
+          <div class="stat"><div class="n" id="statContrib">1.8k+</div><div class="l" data-i18n="stat.contrib">Contributions / year</div></div>
           <div class="stat"><div class="n">10+</div><div class="l" data-i18n="stat.medium">Medium articles</div></div>
-          <div class="stat"><div class="n">13</div><div class="l" data-i18n="stat.streak">Day GitHub streak</div></div>
+          <div class="stat"><div class="n" id="statStreak">13</div><div class="l" data-i18n="stat.streak">Day GitHub streak</div></div>
           <div class="stat"><div class="n">9</div><div class="l" data-i18n="stat.projects">Open-source projects</div></div>
         </div>
       </div>
@@ -679,6 +679,38 @@
           if (navSearch) { navSearch.focus(); navSearch.select(); }
         }
       });
+    })();
+  </script>
+
+  <script>
+    // Live GitHub stats — contributions (trailing 365 days) + current streak.
+    // No-auth public API; keeps the hardcoded numbers as fallback if the fetch fails.
+    (function () {
+      var elContrib = document.getElementById('statContrib');
+      var elStreak = document.getElementById('statStreak');
+      if (!elContrib && !elStreak) return;
+      function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n); }
+      fetch('https://github-contributions-api.jogruber.de/v4/odere-pro?y=all')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)); })
+        .then(function (data) {
+          var today = new Date().toISOString().slice(0, 10);
+          var days = (data.contributions || [])
+            .filter(function (d) { return d.date <= today; })
+            .sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+          if (!days.length) return;
+          var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 365);
+          var iso = cutoff.toISOString().slice(0, 10);
+          var yearTotal = days.reduce(function (s, d) { return d.date >= iso ? s + (d.count || 0) : s; }, 0);
+          if (yearTotal <= 0) return; // parse looks wrong — keep the hardcoded fallback
+          var streak = 0;
+          for (var i = days.length - 1; i >= 0; i--) {
+            if (days[i].count > 0) streak++;
+            else if (i !== days.length - 1) break;
+          }
+          if (elContrib) elContrib.textContent = fmt(yearTotal) + '+';
+          if (elStreak) elStreak.textContent = String(streak);
+        })
+        .catch(function () { /* keep hardcoded fallback */ });
     })();
   </script>
 </body>
